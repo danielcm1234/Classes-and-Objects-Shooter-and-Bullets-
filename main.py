@@ -18,7 +18,7 @@ def playing_area():
     pen.end_fill()
     
 class Player(Turtle):
-    def __init__(self, x, y, color, screen, right_key, left_key):
+    def __init__(self, x, y, color, screen, right_key, left_key, fire_key):
         super().__init__()
         self.ht()
         self.speed(0)
@@ -32,6 +32,7 @@ class Player(Turtle):
         self.st()
         screen.onkeypress(self.turn_left, left_key)
         screen.onkeypress(self.turn_right, right_key)
+        screen.onkey(self.fire, fire_key)
 
     def turn_left(self):
         self.left(10)
@@ -46,6 +47,33 @@ class Player(Turtle):
         if self.ycor() > 230 or self.ycor() < -230:
             self.setheading(-self.heading())
 
+    def fire(self, fire_key):
+        self.bullets.append(Bullet(self, fire_key))
+
+class Bullet(Turtle):
+    def __init__(self, player, fire_key):
+        super().__init__()
+        self.ht()
+        self.speed(0)
+        self.player = player
+        self.color = player.color
+        self.seth(player.heading)
+        self.goto(player.xcor, player.ycor)
+        self.st()
+        self.move()
+        self.fire_key = fire_key
+
+    def move(self):
+        self.forward(8)
+        if self.xcor() > 230 or self.xcor() < -230:
+            self.player.bullets.remove()
+            self.ht()
+        if self.ycor() > 230 or self.ycor() < -230:
+            self.player.bullets.remove()
+            self.ht()
+
+
+
 screen = Screen()
 screen.bgcolor("black")
 screen.setup(520,520)
@@ -55,8 +83,8 @@ screen.listen()
 
 playing_area()
 
-p1 = Player(-100, 0, "red",screen, "d", "a")
-p2 = Player(100,0,"blue",screen, "Right","Left")
+p1 = Player(-100, 0, "red",screen, "d", "a", "w")
+p2 = Player(100,0,"blue",screen, "Right","Left", "Up")
 
 while p1.alive and p2.alive:
     p1.move()
